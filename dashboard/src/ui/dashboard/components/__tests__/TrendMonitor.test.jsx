@@ -214,6 +214,27 @@ describe("TrendMonitor", () => {
     }
   });
 
+  it("dismisses pinned details when their viewport placement becomes stale", () => {
+    const { container } = render(<TrendMonitor rows={[{ total_tokens: 800 }]} />);
+    const bar = container.querySelector('[role="button"]');
+    fireEvent.click(bar);
+    expect(container.querySelector('[data-trend-tooltip]')).not.toBeNull();
+    fireEvent.resize(window);
+    expect(container.querySelector('[data-trend-tooltip]')).toBeNull();
+    fireEvent.click(bar);
+    fireEvent.scroll(container);
+    expect(container.querySelector('[data-trend-tooltip]')).toBeNull();
+  });
+
+  it("keeps pinned details open while their own contents scroll", () => {
+    const models = Object.fromEntries(Array.from({ length: 8 }, (_, i) => [`model-${i}`, 100]));
+    const { container } = render(<TrendMonitor rows={[{ total_tokens: 800, models }]} />);
+    fireEvent.click(container.querySelector('[role="button"]'));
+    const tooltip = container.querySelector('[data-trend-tooltip]');
+    fireEvent.scroll(tooltip.querySelector('.overflow-y-auto'));
+    expect(container.querySelector('[data-trend-tooltip]')).toBe(tooltip);
+  });
+
   it("merges model segments whose names differ only by case", () => {
     expect(mergeModelSegments({
       "GPT-5.5": 120,

@@ -572,6 +572,26 @@ export function TrendMonitor({
     setPinned(true);
   }, [pinned, showBar]);
 
+  // Geometry is measured when a bar is selected. Once an ancestor scrolls or
+  // the viewport resizes, that placement may overflow again (including pinned
+  // details). Close it rather than retaining a stale anchor. Scrolling inside
+  // the details themselves must keep the pinned panel open.
+  React.useEffect(() => {
+    if (!hoveredBar || isZoom) return;
+    const dismissStalePlacement = (event) => {
+      if (event.type === "scroll" && tooltipRef.current?.contains(event.target)) return;
+      setPinned(false);
+      setHoveredBar(null);
+      sweepSideRef.current = null;
+    };
+    window.addEventListener("resize", dismissStalePlacement);
+    window.addEventListener("scroll", dismissStalePlacement, true);
+    return () => {
+      window.removeEventListener("resize", dismissStalePlacement);
+      window.removeEventListener("scroll", dismissStalePlacement, true);
+    };
+  }, [hoveredBar, isZoom]);
+
   React.useEffect(() => {
     if (!pinned) return;
     const dismiss = (event) => {
