@@ -222,6 +222,9 @@ describe("TrendMonitor", () => {
     fireEvent.resize(window);
     expect(container.querySelector('[data-trend-tooltip]')).toBeNull();
     fireEvent.click(bar);
+    fireEvent.scroll(window);
+    expect(container.querySelector('[data-trend-tooltip]')).toBeNull();
+    fireEvent.click(bar);
     fireEvent.scroll(container);
     expect(container.querySelector('[data-trend-tooltip]')).toBeNull();
   });

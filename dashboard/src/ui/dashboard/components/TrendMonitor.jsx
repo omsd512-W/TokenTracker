@@ -579,7 +579,7 @@ export function TrendMonitor({
   React.useEffect(() => {
     if (!hoveredBar || isZoom) return;
     const dismissStalePlacement = (event) => {
-      if (event.type === "scroll" && tooltipRef.current?.contains(event.target)) return;
+      if (event.type === "scroll" && event.target instanceof Node && tooltipRef.current?.contains(event.target)) return;
       setPinned(false);
       setHoveredBar(null);
       sweepSideRef.current = null;
